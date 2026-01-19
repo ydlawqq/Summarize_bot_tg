@@ -9,6 +9,14 @@ from agents import llm_mistral_small, llm_mistral_medium
 from Postgres.repos.Chat_repo import HistoryMessages
 from prompts import prompt_test_agent, prompt_for_rewrite, prompt_for_context
 from llama_index.core.vector_stores import MetadataFilters, MetadataFilter, ExactMatchFilter
+from llama_index.core.node_parser import SentenceSplitter
+
+parser = SentenceSplitter(
+    chunk_size=1024,
+    chunk_overlap=200
+
+)
+
 
 async def get_chunks(state: State):
     filters = MetadataFilters(
@@ -17,8 +25,7 @@ async def get_chunks(state: State):
 
         )]
     )
-
-    retriever = state['query_engine'].as_retriever(
+    retriever = state['index'].as_retriever(
         similarity_top_k=5, vector_store_query_kwargs={
             'filters': filters
         }
@@ -30,7 +37,7 @@ async def get_chunks(state: State):
     chunks = [n.text for n in nodes]
     return chunks
 
-async def from_bytes(bytes:  BytesIO, state: State):
+async def from_bytes(bytes:  BytesIO, state: State)-> list[Document]:
     reader = PdfReader(bytes)
     docs = []
     for page in reader.pages:
@@ -77,7 +84,13 @@ async def pdf_is(state: State):
 
     itg = await from_bytes(bytes, state)
 
-    index = VectorStoreIndex.from_documents(documents=itg, storage_context=state['storage'])
+    index: VectorStoreIndex = state['index']
+
+    nodes = await parser.aget_nodes_from_documents(itg)
+
+    await index.ainsert_nodes(nodes)
+    
+
     return {'write_in_vbd': 'done'}
 
 async def ans(state: State):

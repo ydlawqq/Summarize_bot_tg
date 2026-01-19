@@ -18,7 +18,7 @@ class State(TypedDict):
     session: AsyncSession
     storage: StorageContext
     mode: str
-    query_engine: VectorStoreIndex
+    index: VectorStoreIndex
 
     #states
     chat: HistoryMessages

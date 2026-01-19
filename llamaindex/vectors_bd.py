@@ -6,6 +6,7 @@ import os
 from qdrant_client import QdrantClient, models, AsyncQdrantClient
 from qdrant_client.models import VectorParams
 from llama_index.vector_stores.qdrant import QdrantVectorStore
+from llama_index.core.node_parser import SentenceSplitter
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -48,9 +49,14 @@ async def create_storage_context():
 
     return StorageContext.from_defaults(vector_store=vectorstore)
 
+context = create_storage_context()
 
 async def create_index_query():
-    return  VectorStoreIndex.from_vector_store(vector_store=vectorstore)
+    return  VectorStoreIndex.from_vector_store(vector_store=vectorstore,
+                                               storage_context=context)
+
+
+
 
 
 

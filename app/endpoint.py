@@ -33,9 +33,8 @@ l = {}
 async def lifespan(app: FastAPI):
     url_webhook = 'https://thirty-impalas-bet.loca.lt' + '/webhook'
     await bot.set_webhook(url_webhook, allowed_updates=dp.resolve_used_update_types(), drop_pending_updates=True)
-    app.state.storage = await create_storage_context()
     app.state.graph = graph.compile()
-    app.state.query_engine = await create_index_query()
+    app.state.index = await create_index_query()
     yield
     await bot.delete_webhook()
     l.clear()
@@ -48,7 +47,7 @@ app = FastAPI(lifespan=lifespan)
 
 async def graph_inv(mes: Message, session, state: FSMContext):
     return await app.state.graph.ainvoke({'tg_id': mes.from_user.id, 'mes': mes,
-                                                'bot': bot, 'session': session, 'storage': app.state.storage, 'query_engine': app.state.query_engine, 'mode': await state.get_state()})
+                                                'bot': bot, 'session': session, 'storage': app.state.storage, 'index': app.state.index, 'mode': await state.get_state()})
 
 
 
