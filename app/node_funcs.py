@@ -89,7 +89,7 @@ async def pdf_is(state: State):
     nodes = await parser.aget_nodes_from_documents(itg)
 
     await index.ainsert_nodes(nodes)
-    
+
 
     return {'write_in_vbd': 'done'}
 

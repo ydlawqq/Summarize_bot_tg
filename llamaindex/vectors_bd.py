@@ -37,9 +37,9 @@ vectorstore = QdrantVectorStore(
 
 async def create_storage_context():
     try:
-        qclient.get_collection("docs")
+        await aqclient.get_collection("docs")
     except Exception:    # напрямую проверяем
-            qclient.create_collection(
+            await aqclient.create_collection(
             collection_name="docs",
             vectors_config=VectorParams(
                 size=1024,  # размер эмбеддингов вашей модели
@@ -49,9 +49,12 @@ async def create_storage_context():
 
     return StorageContext.from_defaults(vector_store=vectorstore)
 
-context = create_storage_context()
 
-async def create_index_query():
+
+
+
+
+def create_index_query(context):
     return  VectorStoreIndex.from_vector_store(vector_store=vectorstore,
                                                storage_context=context)
 
