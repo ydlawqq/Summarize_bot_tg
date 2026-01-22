@@ -11,7 +11,7 @@ load_dotenv()
 url = os.getenv('engine')
 
 async_engine = create_async_engine(
-    url='postgresql+asyncpg://ydlawq:retrofm.ru1@localhost:5432/ai_agent',
+    url=url,
     pool_size=5,
     max_overflow=10,
     echo=False
