@@ -16,6 +16,7 @@ from dotenv import load_dotenv
 from Postgres.engine import async_session
 from Postgres.repos.user_repo import UserRepos
 from app.graph_main import graph
+from Postgres.models import create_tables
 
 from llamaindex.vectors_bd import create_storage_context, create_index_query
 
@@ -31,8 +32,9 @@ l = {}
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    url_webhook = 'https://shiny-news-lay.loca.lt' + '/webhook'
+    url_webhook = 'https://lazy-parrots-bake.loca.lt' + '/webhook'
     await bot.set_webhook(url_webhook, allowed_updates=dp.resolve_used_update_types(), drop_pending_updates=True)
+    await create_tables()
     app.state.graph = graph.compile()
     app.state.storage = await create_storage_context()
     app.state.index = create_index_query(app.state.storage)

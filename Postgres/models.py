@@ -2,10 +2,16 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship, DeclarativeBase
 from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey, text, Text, Time, TIMESTAMP, Enum, CheckConstraint, BigInteger
 import datetime
-
+from Postgres.engine import async_engine
 
 class Base(DeclarativeBase):
     pass
+
+
+
+
+
+
 
 
 
@@ -25,7 +31,7 @@ class Users(Base):
 class Chat(Base):
     __tablename__= 'messages'
     __table_args__ = (CheckConstraint(
-        "role IN ('user', 'assistant', 'system')", name='valid_role'
+        "role IN ('user', 'agent', 'system')", name='valid_role'
     ),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -46,6 +52,12 @@ class Documents(Base):
     added_at: Mapped[datetime.datetime] = mapped_column(TIMESTAMP(timezone=True), default=lambda: datetime.datetime.now(datetime.timezone.utc))
 
     user: Mapped["Users"] = relationship(back_populates='documents')
+
+async def create_tables():
+    async with async_engine.connect() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+        await conn.commit()
+
 
 
 
